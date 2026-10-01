@@ -1,7 +1,7 @@
 // A constructed two-week window for a five-person iOS team, used by the demo
-// app and the tests. Not real data. Shaped on the pattern described in this
-// week's HN threads: agents were given whole tickets, so the agents authored
-// the seams too, and two seniors ended up approving rather than designing.
+// app and the tests. Not real data. It models the pattern the article argues
+// against: agents given whole tickets author the seams too, and two seniors
+// end up approving rather than designing.
 
 public enum SampleTeam {
     public static var contributions: [Contribution] {
@@ -33,7 +33,7 @@ public enum SampleTeam {
         add(marco, "Search", .implementation, .reviewed, 7)
         add(marco, "Search", .tests, .reviewed, 3)
 
-        // Profile: mixed. One senior designs, the other only approves.
+        // Profile: mixed. Sam designs; Dana (senior) only approves.
         add(dana, "Profile", .interface, .reviewed, 2)
         add(dana, "Profile", .implementation, .reviewed, 6)
         add(agent, "Profile", .interface, .authored)
