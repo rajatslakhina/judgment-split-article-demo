@@ -1,8 +1,8 @@
-# JudgmentSplit — keep the design, delegate the typing
+# JudgmentSplit: keep the design, delegate the typing
 
-**Article:** (added after publish)
+**Article:** [Your Seniors Aren't Tired of Coding Agents. They're Tired of Approving Designs They Didn't Make.](https://medium.com/@er.rajatlakhina/your-seniors-arent-tired-of-coding-agents-they-re-tired-of-approving-designs-they-didn-t-make-c3e1b1289133) (Medium)
 
-A small Swift package and a runnable iOS demo for one argument: when a coding agent takes over a feature, the lead should keep the four artefacts that carry judgment — the **interface seam**, the **invariants**, the **pass/fail oracle** and the **failure-mode list** — and let the agent write the implementation against them. Hand the agent the whole ticket and your seniors are left approving code they no longer designed.
+A small Swift package and a runnable iOS demo for one argument: when a coding agent takes over a feature, the lead should keep the four artefacts that carry judgment (the **interface seam**, the **invariants**, the **pass/fail oracle** and the **failure-mode list**) and let the agent write the implementation against them. Hand the agent the whole ticket and your seniors are left approving code they no longer designed.
 
 The package has two halves:
 
@@ -77,6 +77,6 @@ Scripts/simulator-screenshots.sh   CI script: build, install, launch on Simulato
 ## Sources
 
 - [Ask HN: Losing motivation to work in the IT field, need advice](https://news.ycombinator.com/item?id=49764727) (Hacker News, September 2026)
-- [Senior developers report declining motivation as AI tools delegate away architectural and coding work](https://www.getreadyforagents.com/news/developer-motivation-loss-ai-delegation-architecture/) (Agentic Ready, 20 Sep 2026)
+- [Senior developers report declining motivation as AI tools delegate away architectural and coding work](https://www.getreadyforagents.com/news/developer-motivation-loss-ai-delegation-architecture/) (Agentic Ready, September 2026)
 
 MIT licensed.
