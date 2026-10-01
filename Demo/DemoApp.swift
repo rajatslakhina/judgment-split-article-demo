@@ -48,6 +48,7 @@ struct OracleScreen: View {
     @State private var report: OracleReport?
     @State private var errorText: String?
     @State private var isRunning = false
+    @State private var didAutorun = false
 
     var body: some View {
         NavigationStack {
@@ -58,7 +59,9 @@ struct OracleScreen: View {
                         Text("After oracle feedback").tag(1)
                     }
                     .pickerStyle(.segmented)
+                    .disabled(isRunning)
                     Stepper("Depth: \(depth) events", value: $depth, in: Oracle.depthRange)
+                        .disabled(isRunning)
                     Button(isRunning ? "Running…" : "Run lead-authored oracle", action: run)
                         .disabled(isRunning)
                         .accessibilityIdentifier("runOracle")
@@ -72,6 +75,7 @@ struct OracleScreen: View {
 
                 if let report {
                     Section("Result") {
+                        LabeledContent("Implementation", value: report.implementation)
                         LabeledContent("Depth", value: "\(report.depth) events")
                         LabeledContent("Traces explored", value: report.tracesExplored.formatted())
                         LabeledContent("Verdict", value: report.passed ? "PASS" : "FAIL")
@@ -98,8 +102,10 @@ struct OracleScreen: View {
                 if report?.depth != depth { report = nil }
             }
             .onAppear {
-                if report == nil, let index = LaunchOptions.autorunImplementation,
+                // CI screenshot hook: runs once per launch, never again on tab switches.
+                if !didAutorun, let index = LaunchOptions.autorunImplementation,
                    reducers.indices.contains(index) {
+                    didAutorun = true
                     selected = index
                     run()
                 }
@@ -120,6 +126,10 @@ struct OracleScreen: View {
             isRunning = false
             switch outcome {
             case .success(let result):
+                // Only show a result for the inputs currently on screen.
+                guard reducers.indices.contains(selected),
+                      result.implementation == reducers[selected].name,
+                      result.depth == self.depth else { return }
                 report = result
                 errorText = nil
             case .failure(let error):
