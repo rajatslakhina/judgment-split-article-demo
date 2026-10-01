@@ -3,6 +3,8 @@
 # and saves real screenshots of the running app to Demo/Screenshots/.
 set -euo pipefail
 
+RUNNER_TEMP="${RUNNER_TEMP:-/tmp}"
+
 BUNDLE_ID="com.rajatlakhina.JudgmentSplitDemo"
 OUT="Demo/Screenshots"
 mkdir -p "$OUT"
@@ -34,8 +36,10 @@ shoot () {
   xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
   xcrun simctl launch "$UDID" "$BUNDLE_ID" "$@"
   sleep 8
-  # Fails the job if the app crashed after launch.
-  xcrun simctl spawn "$UDID" launchctl list | grep -q "$BUNDLE_ID"
+  # Fails the job if the app crashed after launch. Written to a file first:
+  # piping into `grep -q` under pipefail can fail with SIGPIPE (exit 141).
+  xcrun simctl spawn "$UDID" launchctl list > "$RUNNER_TEMP/processes.txt"
+  grep -q "$BUNDLE_ID" "$RUNNER_TEMP/processes.txt"
   xcrun simctl io "$UDID" screenshot "$OUT/$name.png"
 }
 
