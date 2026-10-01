@@ -47,6 +47,7 @@ struct OracleScreen: View {
     @State private var depth = 5
     @State private var report: OracleReport?
     @State private var errorText: String?
+    @State private var isRunning = false
 
     var body: some View {
         NavigationStack {
@@ -58,7 +59,8 @@ struct OracleScreen: View {
                     }
                     .pickerStyle(.segmented)
                     Stepper("Depth: \(depth) events", value: $depth, in: Oracle.depthRange)
-                    Button("Run lead-authored oracle", action: run)
+                    Button(isRunning ? "Running…" : "Run lead-authored oracle", action: run)
+                        .disabled(isRunning)
                         .accessibilityIdentifier("runOracle")
                 } footer: {
                     Text("The lead wrote the seam, the four invariants and this oracle. The agent wrote the reducer.")
@@ -70,6 +72,7 @@ struct OracleScreen: View {
 
                 if let report {
                     Section("Result") {
+                        LabeledContent("Depth", value: "\(report.depth) events")
                         LabeledContent("Traces explored", value: report.tracesExplored.formatted())
                         LabeledContent("Verdict", value: report.passed ? "PASS" : "FAIL")
                             .foregroundStyle(report.passed ? Color.green : Color.red)
@@ -90,6 +93,10 @@ struct OracleScreen: View {
                     report = nil
                 }
             }
+            .onChange(of: depth) {
+                // A result is only valid for the depth it was computed at.
+                if report?.depth != depth { report = nil }
+            }
             .onAppear {
                 if report == nil, let index = LaunchOptions.autorunImplementation,
                    reducers.indices.contains(index) {
@@ -101,13 +108,24 @@ struct OracleScreen: View {
     }
 
     private func run() {
-        guard reducers.indices.contains(selected) else { return }
-        do {
-            report = try Oracle().check(reducers[selected], depth: depth)
-            errorText = nil
-        } catch {
-            report = nil
-            errorText = "Oracle error: \(error)"
+        guard reducers.indices.contains(selected), !isRunning else { return }
+        let reducer = reducers[selected]
+        let depth = self.depth
+        isRunning = true
+        Task { @MainActor in
+            // Depth 6 is 137,256 traces: keep it off the main thread.
+            let outcome = await Task.detached(priority: .userInitiated) {
+                Result { try Oracle().check(reducer, depth: depth) }
+            }.value
+            isRunning = false
+            switch outcome {
+            case .success(let result):
+                report = result
+                errorText = nil
+            case .failure(let error):
+                report = nil
+                errorText = "Oracle error: \(error)"
+            }
         }
     }
 }
