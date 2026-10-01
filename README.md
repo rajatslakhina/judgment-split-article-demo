@@ -41,6 +41,10 @@ report.violations.map(\.invariantID)
 
 The role audit on the constructed sample sprint flags two seniors as reviewer-only and the Search module as design-delegated.
 
+| Fixed reducer passes | Role audit |
+|---|---|
+| ![Oracle passing the reducer after feedback](Demo/Screenshots/oracle-after-feedback-passes.png) | ![Role audit flagging two reviewer-only seniors and a design-delegated module](Demo/Screenshots/role-audit.png) |
+
 ## How to run it
 
 ```bash
@@ -67,7 +71,7 @@ Scripts/simulator-screenshots.sh   CI script: build, install, launch on Simulato
 ## Verification status
 
 - `swift build -Xswiftc -warnings-as-errors` and `swift test` pass locally on Swift 6.1.2 (Linux): **13 tests, 0 failures**.
-- **Simulator run:** done in GitHub Actions, not on my own Mac. The `demo-on-simulator` job builds `Demo.xcodeproj` with `xcodebuild`, installs it on an iPhone Simulator, launches it three times with launch arguments that select a tab or run the oracle through the same code path as the Run button, checks the process is still alive after 8 seconds, and saves the screenshots in `Demo/Screenshots/`. Nobody tapped through the UI by hand.
+- **Simulator run: done, in GitHub Actions on a macOS runner, not on my own Mac.** The `demo-on-simulator` job builds `Demo.xcodeproj` with `xcodebuild`, installs it on an iPhone Simulator, launches it three times with launch arguments (`-autorunOracle 0`, `-autorunOracle 1`, `-showAudit`) that select a tab or run the oracle through the same code path as the Run button, checks the app process is still alive 8 seconds after each launch, and commits the three screenshots in `Demo/Screenshots/`. The first CI run (job `demo-on-simulator`, 5m 42s) passed. Nobody tapped through the UI by hand.
 - The sample team and both agent reducers are **constructed** for the demo. They are not data from a real team.
 
 ## Sources
